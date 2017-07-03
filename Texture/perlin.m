@@ -1,10 +1,31 @@
-function [ out ] = perlin( x,y,g )
+function [ out ] = perlin( nx,ny,ngrad )
 % perlin: Short description
 %
 % Extended description
 % Determine grid cell coordinates
 global Gradient;
-Gradient=g;
+
+Gradient=rand(ngrad,ngrad,2)*2-1;
+
+nmax=max(nx,ny);
+im=zeros(nx,ny);
+for i=0:nx-1
+    for j=0:ny-1
+        im(i+1,j+1)=pperlin(i/nmax*(ngrad/2),j/nmax*(ngrad/2) );
+        
+    end
+end
+out=im;
+
+end  % perlin
+
+function [ out ] = pperlin( x,y )
+% perlin: Short description
+%
+% Extended description
+% Determine grid cell coordinates
+% global Gradient;
+
 x0 = floor(x);
 x1 = x0 + 1;
 y0 = floor(y);
@@ -15,8 +36,8 @@ y1 = y0 + 1;
 sx = x -x0;
 sy = y - y0;
 
-sx=6*sx^5-15*sx^4+10*sx^3;
-sy=6*sy^5-15*sy^4+10*sy^3;
+sx=6.*sx.^5-15*sx.^4+10*sx.^3;
+sy=6.*sy.^5-15*sy.^4+10*sy.^3;
 % Interpolate between grid point gradients
 n0 = dotGridGradient(x0, y0, x, y);
 n1 = dotGridGradient(x1, y0, x, y);
@@ -27,8 +48,6 @@ ix1 = lerp(n0, n1, sx);
 out = lerp(ix0, ix1, sy);
 
 end  % perlin
-
-
 
 % Function to linearly interpolate between a0 and a1
 % Weight w should be in the range [0.0, 1.0]
@@ -43,9 +62,9 @@ function out =dotGridGradient( ix, iy,  x,  y)
     global Gradient;
 
     % Compute the distance vector
-     dx = x - double(ix);
-     dy = y - double(iy);
+     dx = x - ix;
+     dy = y - iy;
 
     % Compute the dot-product
-    out= (dx*Gradient(iy+1,ix+1,1) + dy*Gradient(iy+1,ix+1,2));
+    out= (dx.*Gradient(iy+1,ix+1,1) + dy.*Gradient(iy+1,ix+1,2));
 end
